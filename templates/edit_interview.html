@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block title %}Edit interview plan | CareerTrack{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div><p class="eyebrow">CAREER TOOLS</p><h1>Edit interview plan</h1><p class="muted">Change the round, date, questions or preparation notes.</p></div>
+  <a class="btn light" href="{{ url_for('interviews') }}">← Interview Prep</a>
+</div>
+<section class="panel">
+  <form method="post" class="form-grid">
+    <label class="span-2">Application
+      <select name="application_id" required>
+        {% for app in applications %}
+        <option value="{{ app.id }}" {% if app.id == item.application_id %}selected{% endif %}>{{ app.company }} — {{ app.role }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Interview date<input type="date" name="interview_date" value="{{ item.interview_date }}"></label>
+    <label>Round name<input name="round_name" required value="{{ item.round_name }}"></label>
+    <label>Preparation status
+      <select name="preparation_status">
+        <option {% if item.preparation_status == 'Not Started' %}selected{% endif %}>Not Started</option>
+        <option {% if item.preparation_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+        <option {% if item.preparation_status == 'Completed' %}selected{% endif %}>Completed</option>
+      </select>
+    </label>
+    <label class="span-2">Questions to prepare<textarea name="questions" rows="5">{{ item.questions }}</textarea></label>
+    <label class="span-2">Preparation notes<textarea name="notes" rows="5">{{ item.notes }}</textarea></label>
+    <div class="span-2"><button class="btn primary">Save interview changes</button></div>
+  </form>
+</section>
+{% endblock %}

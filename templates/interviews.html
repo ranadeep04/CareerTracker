@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% block title %}Interview Prep | CareerTrack{% endblock %}
+{% block content %}
+<div class="topbar"><div><p class="eyebrow">CAREER TOOLS</p><h1>Interview preparation</h1><p class="muted">Connect interview rounds to the applications you are tracking.</p></div></div>
+<section class="panel"><div class="panel-head"><h2>Add an interview round</h2></div>
+{% if applications %}
+<form method="post" action="{{ url_for('add_interview') }}" class="form-grid">
+<label class="span-2">Application<select name="application_id" required>{% for app in applications %}<option value="{{ app.id }}">{{ app.company }} — {{ app.role }}</option>{% endfor %}</select></label>
+<label>Interview date<input type="date" name="interview_date"></label>
+<label>Round name<input name="round_name" required placeholder="e.g. Technical round 1"></label>
+<label>Preparation status<select name="preparation_status"><option>Not Started</option><option>In Progress</option><option>Completed</option></select></label>
+<label class="span-2">Questions to prepare<textarea name="questions" rows="3" placeholder="Python basics, SQL joins, project explanation..."></textarea></label>
+<label class="span-2">Preparation notes<textarea name="notes" rows="3" placeholder="Topics to revise, examples, feedback..."></textarea></label>
+<div class="span-2"><button class="btn primary">Add interview plan</button></div>
+</form>
+{% else %}<p class="empty">Add an application on the dashboard before creating an interview plan.</p>{% endif %}
+</section>
+<section class="panel"><div class="panel-head"><h2>Your interview plans</h2><span class="count">{{ interviews|length }}</span></div>
+{% for item in interviews %}
+<div class="interview-card">
+<div class="interview-top"><div><b>{{ item.company }} — {{ item.role }}</b><small>{{ item.round_name }} · {{ item.interview_date or 'Date not set' }}</small></div><span class="status assessment">{{ item.preparation_status }}</span></div>
+{% if item.questions %}<p><b>Questions:</b> {{ item.questions }}</p>{% endif %}
+{% if item.notes %}<p><b>Notes:</b> {{ item.notes }}</p>{% endif %}
+<div class="actions">
+<a href="{{ url_for('edit_interview', interview_id=item.id) }}">Edit details</a>
+<form method="post" action="{{ url_for('update_interview', interview_id=item.id) }}"><select name="preparation_status"><option {% if item.preparation_status == 'Not Started' %}selected{% endif %}>Not Started</option><option {% if item.preparation_status == 'In Progress' %}selected{% endif %}>In Progress</option><option {% if item.preparation_status == 'Completed' %}selected{% endif %}>Completed</option></select><button class="btn secondary small">Update</button></form>
+<form method="post" action="{{ url_for('delete_interview', interview_id=item.id) }}" onsubmit="return confirm('Delete this interview plan?')"><button class="link danger-text">Delete</button></form>
+</div>
+</div>
+{% else %}<p class="empty">No interview plans yet.</p>{% endfor %}
+</section>
+{% endblock %}

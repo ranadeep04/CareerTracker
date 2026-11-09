@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% block title %}Edit application | CareerTrack{% endblock %}
+{% block content %}
+<div class="topbar"><div><p class="eyebrow">APPLICATION</p><h1>Edit application</h1><p class="muted">Update its status, reminder or notes.</p></div><a class="btn light" href="{{ url_for('index') }}">← Dashboard</a></div>
+<section class="panel"><form method="post" class="form-grid">
+<label>Company *<input name="company" required value="{{ application.company }}"></label>
+<label>Job role *<input name="role" required value="{{ application.role }}"></label>
+<label>Location<input name="location" value="{{ application.location }}"></label>
+<label>Job link<input type="url" name="job_link" value="{{ application.job_link }}"></label>
+<label>Status<select name="status">{% for s in ['Applied','Assessment','Interview','Offer','Rejected'] %}<option {% if application.status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+<label>Applied date *<input type="date" name="applied_date" required value="{{ application.applied_date }}"></label>
+<label>Follow-up date<input type="date" name="follow_up_date" value="{{ application.follow_up_date }}"></label>
+<label>Follow-up reminder<input name="follow_up_note" value="{{ application.follow_up_note }}"></label>
+<label class="span-2">Job description<textarea name="job_description" rows="4">{{ application.job_description }}</textarea></label>
+<label class="span-2">Notes<textarea name="notes" rows="4">{{ application.notes }}</textarea></label>
+<div class="span-2"><button class="btn primary">Save changes</button></div>
+</form></section>
+{% endblock %}

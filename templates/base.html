@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CareerTrack{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% if current_user %}
+<div class="layout">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('index') }}">Career<span>Track</span></a>
+    <p class="side-label">WORKSPACE</p>
+    <a href="{{ url_for('index') }}">▦ &nbsp; Dashboard</a>
+    <a href="{{ url_for('skills_profile') }}">◎ &nbsp; My Skills & Resume</a>
+    <a href="{{ url_for('analyzer') }}">⌕ &nbsp; Skill Analyzer</a>
+    <a href="{{ url_for('interviews') }}">▣ &nbsp; Interview Prep</a>
+    <div class="side-bottom">
+      <div class="user-chip"><div class="avatar">{{ current_user[:1]|upper }}</div><div><b>{{ current_user }}</b><small>Personal workspace</small></div></div>
+      <a href="{{ url_for('logout') }}">↪ &nbsp; Log out</a>
+    </div>
+  </aside>
+  <main class="main">
+{% else %}
+<main class="auth-main">
+{% endif %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+{% if current_user %}</div>{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

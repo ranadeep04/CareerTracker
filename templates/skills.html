@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}My Skills & Resume | CareerTrack{% endblock %}
+{% block content %}
+<div class="topbar"><div><p class="eyebrow">CANDIDATE PROFILE</p><h1>My skills & resume</h1><p class="muted">Upload a PDF or TXT resume to detect skills, then review and edit the detected list.</p></div></div>
+<div class="notice">Resume extraction uses text already embedded in the file. Scanned/image-only PDFs may not work because OCR is not included. Your skill list is saved to your CareerTrack account.</div>
+<section class="panel"><form method="post" enctype="multipart/form-data" class="form-grid">
+<label class="span-2">Upload resume (PDF or TXT)<input type="file" name="resume" accept=".pdf,.txt,application/pdf,text/plain"></label>
+{% if profile and profile.resume_filename %}<p class="muted span-2">Last uploaded resume: {{ profile.resume_filename }}</p>{% endif %}
+<label class="span-2">Detected / candidate skills<textarea name="skills" rows="6" placeholder="Python, SQL, Flask, HTML, CSS, Git, communication">{{ profile.skills if profile else '' }}</textarea><small>Separate skills with commas. You can correct or add skills before saving.</small></label>
+<div class="span-2"><button class="btn primary">Save my skill profile</button></div></form></section>
+{% endblock %}

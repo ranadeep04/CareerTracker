@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}Log in | CareerTrack{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <a class="brand" href="{{ url_for('login') }}">Career<span>Track</span></a>
+  <p class="eyebrow">YOUR JOB SEARCH, ORGANIZED</p>
+  <h1>Welcome back</h1><p class="muted">Log in to manage your career journey.</p>
+  <form method="post" class="stack">
+    <label>Email address<input type="email" name="email" required placeholder="you@example.com"></label>
+    <label>Password<input type="password" name="password" required placeholder="Your password"></label>
+    <button class="btn primary full">Log in</button>
+  </form>
+  <p class="auth-foot">New to CareerTrack? <a href="{{ url_for('register') }}">Create an account</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}{% block title %}Dashboard | CareerTrack{% endblock %}
+{% block head %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>{% endblock %}
+{% block content %}
+<div class="topbar"><div><p class="eyebrow">OVERVIEW</p><h1>Application dashboard</h1><p class="muted">Track every opportunity from application to offer.</p></div><span class="date-pill">{{ today }}</span></div>
+
+<section class="stats">
+  <div class="stat-card"><span>Total applications</span><strong>{{ total }}</strong><small>All tracked opportunities</small></div>
+  <div class="stat-card"><span>Interviews</span><strong>{{ status_counts['Interview'] }}</strong><small>Interview stage</small></div>
+  <div class="stat-card"><span>Offers</span><strong>{{ status_counts['Offer'] }}</strong><small>Offers received</small></div>
+  <div class="stat-card"><span>Follow-ups overdue</span><strong class="{{ 'danger-text' if overdue else '' }}">{{ overdue|length }}</strong><small>Need your attention</small></div>
+</section>
+
+<section class="two-col">
+  <div class="panel"><div class="panel-head"><div><h2>Application activity</h2><p class="muted">Applications added by month</p></div></div><div class="chart-wrap"><canvas id="applicationChart"></canvas></div></div>
+  <div class="panel"><div class="panel-head"><div><h2>Pipeline</h2><p class="muted">Current application statuses</p></div></div><div class="chart-wrap"><canvas id="statusChart"></canvas></div></div>
+</section>
+
+<section class="two-col reminders">
+  <div class="panel"><div class="panel-head"><h2>Overdue follow-ups</h2><span class="count">{{ overdue|length }}</span></div>
+    {% if overdue %}{% for item in overdue %}<div class="reminder-row"><div><b>{{ item.company }}</b><small>{{ item.role }} · Due {{ item.follow_up_date }}</small></div><span class="status rejected">Overdue</span></div>{% endfor %}
+    {% else %}<p class="empty">No overdue follow-ups. Nice work!</p>{% endif %}
+  </div>
+  <div class="panel"><div class="panel-head"><h2>Upcoming follow-ups</h2><span class="count">{{ upcoming|length }}</span></div>
+    {% if upcoming %}{% for item in upcoming %}<div class="reminder-row"><div><b>{{ item.company }}</b><small>{{ item.role }} · {{ item.follow_up_date }}</small></div><span class="status assessment">Upcoming</span></div>{% endfor %}
+    {% else %}<p class="empty">No upcoming reminders.</p>{% endif %}
+  </div>
+</section>
+
+<section class="panel add-panel">
+  <div class="panel-head"><div><h2>Add an application</h2><p class="muted">Save the details while they are fresh.</p></div></div>
+  <form method="post" action="{{ url_for('add_application') }}" class="form-grid">
+    <label>Company *<input name="company" required placeholder="e.g. Infosys"></label>
+    <label>Job role *<input name="role" required placeholder="e.g. Python Developer"></label>
+    <label>Location<input name="location" placeholder="e.g. Bengaluru"></label>
+    <label>Job link<input type="url" name="job_link" placeholder="https://..."></label>
+    <label>Status<select name="status">{% for s in statuses %}<option>{{ s }}</option>{% endfor %}</select></label>
+    <label>Applied date *<input type="date" name="applied_date" required value="{{ today }}"></label>
+    <label>Follow-up date<input type="date" name="follow_up_date"></label>
+    <label>Follow-up reminder<input name="follow_up_note" placeholder="e.g. Email recruiter"></label>
+    <label class="span-2">Job description<textarea name="job_description" rows="2" placeholder="Paste the job description for later skill analysis"></textarea></label>
+    <label class="span-2">Notes<textarea name="notes" rows="2" placeholder="Recruiter name, source, next step..."></textarea></label>
+    <div class="span-2"><button class="btn primary">+ Add application</button></div>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><h2>Your applications</h2><p class="muted">Search, filter, edit or remove a record.</p></div></div>
+  <form method="get" class="toolbar">
+    <input name="search" value="{{ search }}" placeholder="Search company, role or location">
+    <select name="status"><option value="">All statuses</option>{% for s in statuses %}<option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+    <button class="btn secondary">Apply filters</button><a class="btn light" href="{{ url_for('index') }}">Reset</a>
+  </form>
+  <div class="table-scroll"><table><thead><tr><th>Company / Role</th><th>Location</th><th>Status</th><th>Applied</th><th>Follow-up</th><th>Actions</th></tr></thead><tbody>
+  {% for item in applications %}
+    <tr><td><b>{{ item.company }}</b><small>{{ item.role }}</small></td><td>{{ item.location or '—' }}</td><td><span class="status {{ item.status|lower }}">{{ item.status }}</span></td><td>{{ item.applied_date }}</td><td>{{ item.follow_up_date or '—' }}</td><td class="actions"><a href="{{ url_for('edit_application', app_id=item.id) }}">Edit</a><form method="post" action="{{ url_for('delete_application', app_id=item.id) }}" onsubmit="return confirm('Delete this application?')"><button class="link danger-text">Delete</button></form>{% if item.job_link %}<a href="{{ item.job_link }}" target="_blank" rel="noopener">Link</a>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="6" class="empty">No applications found. Add your first application above.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const labels = {{ chart_labels|tojson }};
+const values = {{ chart_values|tojson }};
+const statusLabels = {{ statuses|tojson }};
+const statusValues = {{ chart_status_values|tojson }};
+new Chart(document.getElementById('applicationChart'), {type:'line',data:{labels,datasets:[{label:'Applications',data:values,tension:.35,fill:true,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('statusChart'), {type:'doughnut',data:{labels:statusLabels,datasets:[{data:statusValues,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+</script>
+{% endblock %}
